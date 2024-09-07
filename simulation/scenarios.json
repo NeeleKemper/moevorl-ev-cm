@@ -1,0 +1,33 @@
+{
+  "scenario_CS05": {
+    "n_charging_points": 5,
+    "pv_scaling": 0.25,
+    "charging_event_density": 1.5,
+    "maximum_grid_node_power": 40,
+    "alternating_phase_connection": false,
+    "maximum_charging_point_current": 16,
+    "maximum_phase_difference": 20,
+    "minimum_required_soc": 0.8
+  },
+  "scenario_CS10": {
+    "n_charging_points": 10,
+    "pv_scaling": 0.25,
+    "charging_event_density": 1.5,
+    "maximum_grid_node_power": 40,
+    "alternating_phase_connection": false,
+    "maximum_charging_point_current": 16,
+    "maximum_phase_difference": 20,
+    "minimum_required_soc": 0.8
+  },
+  "scenario_CS15": {
+    "n_charging_points": 15,
+    "pv_scaling": 0.25,
+    "charging_event_density": 1.5,
+    "maximum_grid_node_power": 40,
+    "alternating_phase_connection": false,
+    "maximum_charging_point_current": 16,
+    "maximum_phase_difference": 20,
+    "minimum_required_soc": 0.8
+
+  }
+}

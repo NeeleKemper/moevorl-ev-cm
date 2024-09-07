@@ -1,0 +1,98 @@
+{
+  "Audi Q8 e-tron 50 quattro 3-phase": {
+    "battery_capacity_kwh": 89.0,
+    "charging_power_16A": 11,
+    "charging_power_32A": 22,
+    "n_charging_phases": 3
+  },
+  "Volkswagen ID.4 Pro 3-phase": {
+    "battery_capacity_kwh": 77.0,
+    "charging_power_16A": 11,
+    "charging_power_32A": 22,
+    "n_charging_phases": 3
+  },
+  "BMW iX1 xDrive30 3-phase": {
+    "battery_capacity_kwh": 64.7,
+    "charging_power_16A": 11,
+    "charging_power_32A": 22,
+    "n_charging_phases": 3
+  },
+  "Tesla Model 3 3-phase": {
+    "battery_capacity_kwh": 57.7,
+    "charging_power_16A": 11,
+    "charging_power_32A": 11,
+    "n_charging_phases": 3
+  },
+  "Renault Kangoo E-Tech Electric 3-phase": {
+    "battery_capacity_kwh": 45.0,
+    "charging_power_16A": 11,
+    "charging_power_32A": 11,
+    "n_charging_phases": 3
+  },
+  "Fiat 500e Cabrio 42 kWh 3-phase": {
+    "battery_capacity_kwh": 37.3,
+    "charging_power_16A": 11,
+    "charging_power_32A": 11,
+    "n_charging_phases": 3
+  },
+  "Volkswagen ID.3 2-phase": {
+    "battery_capacity_kwh": 58.0,
+    "charging_power_16A": 7.4,
+    "charging_power_32A": 7.4,
+    "n_charging_phases": 2
+  },
+  "Mercedes EQT 200 Standard 2-phase": {
+    "battery_capacity_kwh": 45.0,
+    "charging_power_16A": 7.4,
+    "charging_power_32A": 7.4,
+    "n_charging_phases": 2
+  },
+  "Volkswagen e-Up 2-phase": {
+    "battery_capacity_kwh": 32.3,
+    "charging_power_16A": 7.4,
+    "charging_power_32A": 7.4,
+    "n_charging_phases": 2
+  },
+  "BMW iX1 xDrive30 1-phase": {
+    "battery_capacity_kwh": 64.7,
+    "charging_power_16A": 3.7,
+    "charging_power_32A": 7.4,
+    "n_charging_phases": 1
+  },
+  "Tesla Model 3 1-phase": {
+    "battery_capacity_kwh": 57.7,
+    "charging_power_16A": 3.7,
+    "charging_power_32A": 7.4,
+    "n_charging_phases": 1
+  },
+  "Renault Kangoo E-Tech Electric 1-phase": {
+    "battery_capacity_kwh": 45.0,
+    "charging_power_16A": 3.7,
+    "charging_power_32A": 7.4,
+    "n_charging_phases": 1
+  },
+  "Fiat 500e Cabrio 42 kWh 1-phase": {
+    "battery_capacity_kwh": 37.3,
+    "charging_power_16A": 3.7,
+    "charging_power_32A": 7.4,
+    "n_charging_phases": 1
+  },
+  "Honda e Advance 1-phase": {
+    "battery_capacity_kwh": 28.5,
+    "charging_power_16A": 3.7,
+    "charging_power_32A": 7.4,
+    "n_charging_phases": 1
+  },
+  "Smart EQ fortwo 1-phase": {
+    "battery_capacity_kwh": 16.7,
+    "charging_power_16A": 3.7,
+    "charging_power_32A": 7.4,
+    "n_charging_phases": 1
+  },
+  "Audi A3 Plug-in Hybrid": {
+    "battery_capacity_kwh": 8.8,
+    "charging_power_16A": 3.7,
+    "charging_power_32A": 7.4,
+    "n_charging_phases": 1
+  }
+}

@@ -1,0 +1,89 @@
+[NEAT]
+pop_size = 200
+# Note: the fitness threshold will never be reached because
+# we are controlling the termination ourselves based on simulation performance.
+fitness_criterion     	= min
+fitness_threshold     	= 1000
+reset_on_extinction   	= True
+no_fitness_termination	= False
+
+[DefaultGenome]
+# node activation options
+activation_default      = sigmoid
+activation_mutate_rate = 0.0
+activation_options      = sigmoid
+
+# node aggregation options
+aggregation_default     = random
+aggregation_mutate_rate = 0.29
+aggregation_options     = sum product min max mean median maxabs
+
+single_structural_mutation	= False
+structural_mutation_surer	= default
+
+# node bias options
+bias_init_type		= gaussian
+bias_init_mean          = 0.05
+bias_init_stdev         = 1.0
+bias_max_value          = 30.0
+bias_min_value          = -30.0
+bias_mutate_power       = 0.5
+bias_mutate_rate = 0.67
+bias_replace_rate       = 0.1
+
+# genome compatibility options
+compatibility_disjoint_coefficient = 1.0
+compatibility_weight_coefficient   = 0.5
+
+# connection add/remove rates
+conn_add_prob = 0.73
+conn_delete_prob = 0.35
+
+# connection enable options
+enabled_default         	= True
+enabled_mutate_rate     	= 0.2
+enabled_rate_to_true_add	= 0.0
+enabled_rate_to_false_add	= 0.0
+
+feed_forward            = False
+initial_connection      = partial_nodirect 0.5
+# options (unconnected, fs_neat, full)
+
+# node add/remove rates
+node_add_prob = 0.65
+node_delete_prob = 0.33
+
+# network parameters
+num_hidden              = 1
+num_inputs = 100
+num_outputs  = 15
+
+# node response options
+response_init_mean      = 1.0
+response_init_stdev     = 0.05
+response_max_value      = 30.0
+response_min_value      = -30.0
+response_mutate_power   = 0.1
+response_mutate_rate    = 0.8
+response_replace_rate   = 0.1
+
+# connection weight options
+weight_init_type	= gaussian
+weight_init_mean        = 0.1
+weight_init_stdev       = 1.0
+weight_max_value        = 30.
+weight_min_value        = -30.
+weight_mutate_power     = 0.5
+weight_mutate_rate = 0.71
+weight_replace_rate     = 0.1
+
+[DefaultSpeciesSet]
+compatibility_threshold = 2.5
+
+[DefaultStagnation]
+species_fitness_func = min
+max_stagnation       = 50
+species_elitism      = 20
+
+[NSGA2Reproduction]
+survival_threshold = 0.18

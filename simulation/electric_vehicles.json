@@ -1,0 +1,75 @@
+{
+  "Audi Q8 e-tron 50 quattro 3-phase": {
+    "battery_capacity_kwh": 89.0,
+    "charging_power_16A": 11,
+    "charging_power_32A": 22,
+    "n_charging_phases": 3
+  },
+  "BMW i4 eDrive40 3-phase": {
+    "battery_capacity_kwh": 80.7,
+    "charging_power_16A": 11,
+    "charging_power_32A": 22,
+    "n_charging_phases": 3
+  },
+  "Porsche Taycan 3-phase": {
+    "battery_capacity_kwh": 71.0,
+    "charging_power_16A": 11,
+    "charging_power_32A": 22,
+    "n_charging_phases": 3
+  },
+  "Mercedes EQV 250 Long 3-phase": {
+    "battery_capacity_kwh": 60.0,
+    "charging_power_16A": 11,
+    "charging_power_32A": 11,
+    "n_charging_phases": 3
+  },
+  "Fiat 600e 3-phase": {
+    "battery_capacity_kwh": 50.8,
+    "charging_power_16A": 11,
+    "charging_power_32A": 11,
+    "n_charging_phases": 3
+  },
+  "Renault Megane E-Tech EV40 130hp 3-phase": {
+    "battery_capacity_kwh": 40.0,
+    "charging_power_16A": 11,
+    "charging_power_32A": 11,
+    "n_charging_phases": 3
+  },
+  "Volkswagen ID.3 Pro 2-phase": {
+    "battery_capacity_kwh": 58.0,
+    "charging_power_16A": 7.4,
+    "charging_power_32A": 7.4,
+    "n_charging_phases": 2
+  },
+  "Mercedes EQT 200 Standard 2-phase": {
+    "battery_capacity_kwh": 45.0,
+    "charging_power_16A": 7.4,
+    "charging_power_32A": 7.4,
+    "n_charging_phases": 2
+  },
+  "Mini Cooper E 1-phase": {
+    "battery_capacity_kwh": 37.0,
+    "charging_power_16A": 3.7,
+    "charging_power_32A": 7.4,
+    "n_charging_phases": 1
+  },
+  "Dacia Spring Electric 45 1-phase": {
+    "battery_capacity_kwh": 25.0,
+    "charging_power_16A": 3.7,
+    "charging_power_32A": 7.4,
+    "n_charging_phases": 1
+  },
+  "Smart EQ fortwo 1-phase": {
+    "battery_capacity_kwh": 16.7,
+    "charging_power_16A": 3.7,
+    "charging_power_32A": 7.4,
+    "n_charging_phases": 1
+  },
+  "Audi A3 Sportback e-tron 1-phase": {
+    "battery_capacity_kwh": 8.8,
+    "charging_power_16A": 3.7,
+    "charging_power_32A": 7.4,
+    "n_charging_phases": 1
+  }
+}
+

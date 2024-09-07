@@ -1,0 +1,18 @@
+Number of scheduled charging events: 2156
+Average number of events per day:  5.91
+car
+Mini Cooper E 1-phase                       254
+Audi Q8 e-tron 50 quattro 3-phase           196
+Volkswagen ID.3 Pro 2-phase                 192
+BMW i4 eDrive40 3-phase                     184
+Porsche Taycan 3-phase                      179
+Mercedes EQT 200 Standard 2-phase           178
+Dacia Spring Electric 45 1-phase            172
+Mercedes EQV 250 Long 3-phase               169
+Fiat 600e 3-phase                           160
+Renault Megane E-Tech EV40 130hp 3-phase    159
+Audi A3 Sportback e-tron 1-phase            157
+Smart EQ fortwo 1-phase                     156
+Name: count, dtype: int64
+1-Phase: 739, 2-Phase: 370, 3-Phase: 1047
+Number of envs: 373
