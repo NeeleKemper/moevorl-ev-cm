@@ -57,7 +57,7 @@ class EvoRLNEAT(MOAgent, MOPolicy):
         MOAgent.__init__(self, envs[0], device=device, seed=seed)
         MOPolicy.__init__(self, device=device)
 
-        config_path = f'morl_baselines/multi_policy/evorl/config/{config_file}'
+        config_path = f'morl/multi_policy/evorl/config/{config_file}'
         self.config_file = config_file
         self.algorithm = algorithm
         self.pop_size = pop_size

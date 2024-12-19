@@ -145,8 +145,6 @@ def calculate_object_metrics(df_group: pd.DataFrame, group_by: str | None = 'wei
 def get_scenario_name(scenario: str, utilization: str = 'norm', env_seed: int = 42):
     return f'{scenario}-{utilization.title()}-{env_seed}'
 
-
-
 def get_metric_name(metric: str):
     replacements = {
         'Obj': 'Overall',
@@ -168,7 +166,7 @@ def evaluate_metrics(path: str, scenario: str, utilization: str = 'norm', env_se
     results = {alg: [] for alg in ALGORITHMS}
 
     for algorithm in ALGORITHMS:
-        df_temp = pd.read_csv(f'{path}/{algorithm.upper()}_{title_scenario}.csv',
+        df_temp = pd.read_csv(f'{path}/{algorithm.upper().replace("_", "-")}_{title_scenario}.csv',
                               sep=';')
         if not metrics:
             metrics = df_temp.columns.to_list()
@@ -207,7 +205,7 @@ def generate_plots(path: str, scenario: str, utilization: str = 'norm', env_seed
 
     # Load data and add a column to identify the algorithm
     for algorithm in ALGORITHMS:
-        df_temp = pd.read_csv(f'{path}/{algorithm.upper()}_{title_scenario}.csv', sep=';')
+        df_temp = pd.read_csv(f'{path}/{algorithm.upper().replace("_", "-")}_{title_scenario}.csv', sep=';')
         df_temp['algorithm'] = algorithm
         all_data.append(df_temp)
 

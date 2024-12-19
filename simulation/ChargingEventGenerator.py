@@ -152,7 +152,7 @@ class ChargingEventGenerator(object):
         self.start_date = START_DATE
 
         # Load the list of electric vehicles
-        self.cars = json.load(open('electric_vehicles.json'))
+        self.cars = json.load(open('simulation/electric_vehicles.json'))
         self.car_selection_counts = {car: 0 for car in self.cars.keys()}  # Initialize counts for each car
 
         gmm_file_weekday = f'gmm_work_weekday_70'

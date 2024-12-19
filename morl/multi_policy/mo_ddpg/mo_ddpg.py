@@ -65,6 +65,7 @@ class EarlyStopping:
         return False
 
     def load_best_model(self, q, actor, q_target, actor_target, q_optimizer, actor_optimizer):
+        print('Loading best model...')
         if self.best_q is not None:
             q.load_state_dict(self.best_q)
         if self.best_actor is not None:
@@ -168,19 +169,19 @@ class QNetwork(nn.Module):
 class Actor(nn.Module):
     def __init__(self, obs_dim: int, action_dim: int, reward_dim: int, action_space: any, net_arch=[256, 256]):
         super().__init__()
-        self.net = mlp(obs_dim + reward_dim, action_dim, net_arch)
+        self.net = mlp(obs_dim + reward_dim, -1, net_arch)
+        self.mean = nn.Linear(net_arch[-1], action_dim)
 
-        # action rescaling
-        self.register_buffer(
-            'action_scale', torch.tensor((action_space.high - action_space.low) / 2.0, dtype=torch.float32)
-        )
-        self.register_buffer(
-            'action_bias', torch.tensor((action_space.high + action_space.low) / 2.0, dtype=torch.float32)
-        )
+        self.register_buffer('action_scale',
+                             torch.tensor((action_space.high - action_space.low) / 2.0, dtype=torch.float32))
+        self.register_buffer('action_bias',
+                             torch.tensor((action_space.high + action_space.low) / 2.0, dtype=torch.float32))
 
-    def forward(self, obs, w):
-        x = torch.concat((obs, w), dim=obs.dim() - 1)
-        x = self.net(x)
+        self.apply(layer_init)
+
+    def forward(self, obs: torch.Tensor, w: torch.Tensor):
+        x = self.net(torch.concat((obs, w), dim=obs.dim() - 1))
+        x = self.mean(x)
         return torch.tanh(x) * self.action_scale + self.action_bias
 
     def get_action(self, obs, w):
@@ -441,6 +442,10 @@ class MODDPG(MOAgent, MOPolicy):
                             print('Early stopping triggered')
                             break
                     obs, info = env.reset()
+                    self.early_stopper.load_best_model(q=self.qf1, actor=self.actor, q_target=self.qf1_target,
+                                                       actor_target=self.actor_target,
+                                                       q_optimizer=self.q_optimizer,
+                                                       actor_optimizer=self.actor_optimizer)
 
                 elif self.global_step % eval_freq == 0:
                     eval_weights_temp = random.choices(eval_weights, k=int(num_eval_weights_for_front * 0.1))
@@ -456,6 +461,7 @@ class MODDPG(MOAgent, MOPolicy):
                         avg_constraint_violations,
                         log_name='eval',
                     )
+                    self.save(sub_folder=sub_folder, filename=save_file_name, save_replay_buffer=False)
                     wandb.log({'num_episodes': self.num_episodes, 'training_time': round(total_training_time)})
 
         self.global_step += 1
@@ -562,4 +568,3 @@ class MODDPG(MOAgent, MOPolicy):
 
     def get_weights(self, num_eval_weights_for_front: int = 200):
         return equally_spaced_weights(self.reward_dim, n=num_eval_weights_for_front, seed=self.seed)
-

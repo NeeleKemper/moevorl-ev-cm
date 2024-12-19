@@ -47,6 +47,33 @@ def run_episode(env: Any, agent: Any, w: Any) -> tuple:
     return vec_return, disc_vec_return
 
 
+def eval_so(
+        agent,
+        envs,
+        render: bool = False,
+) -> tuple[ndarray, ndarray, ndarray]:
+    reward_dim = envs[0].reward_dim
+    n = len(envs)
+
+    vec_returns, disc_vec_returns = np.zeros((n, reward_dim)), np.zeros((n, reward_dim))
+
+    for i, env in enumerate(envs):
+        vec_return, disc_vec_return = run_episode(env, agent, [])
+        vec_returns[i], disc_vec_returns[i] = vec_return, disc_vec_return
+
+    count = np.sum(vec_returns[:, 0] < 0)
+    constraint_violations = count / len(vec_returns)
+
+    vec_returns = np.mean(vec_returns, axis=0)
+    disc_vec_returns = np.mean(disc_vec_returns, axis=0)
+
+    return (
+        vec_returns,
+        disc_vec_returns,
+        constraint_violations
+    )
+
+
 def eval_mo(
         agent,
         envs,
@@ -171,10 +198,24 @@ def eval_mo_reward_conditioned(
     )
 
 
+def single_policy_evaluation(agent, eval_envs, rep: int = 5):
+    evals = [eval_so(agent, eval_envs) for _ in range(rep)]
+    avg_vec_return = np.mean([eval[0] for eval in evals], axis=0)
+    avg_disc_vec_return = np.mean([eval[1] for eval in evals], axis=0)
+    avg_constraint_violations = np.mean([eval[2] for eval in evals])
+    front = [eval[2] for eval in evals]
+
+    return (
+        avg_vec_return,
+        avg_disc_vec_return,
+        avg_constraint_violations,
+        front
+    )
+
+
 def multi_policy_evaluation(agent, eval_envs, w: list, rep: int = 5):
     evals = [
         policy_evaluation_mo(agent, eval_envs, ew, rep=rep) for ew in w]
-
     avg_scalarized_return = np.mean([eval[0] for eval in evals])
     avg_scalarized_discounted_return = np.mean([eval[1] for eval in evals])
     avg_vec_return = np.mean([eval[2] for eval in evals], axis=0)
@@ -237,6 +278,8 @@ def policy_evaluation_evorl(agent, env, w: list, rep: int = 5) -> Tuple[
         avg_disc_vec_return,
         avg_constraint_violations
     )
+
+
 
 
 def policy_evaluation_mo(agent, env, w: np.ndarray, rep: int = 5) -> Tuple[

@@ -13,22 +13,22 @@ def moddpg(scenario: str, seed: int):
 
     agent = MODDPG(
         env_list,
-        learning_rate=6.2e-5,
+        learning_rate=5e-5,
         gamma=0.99,
-        tau=0.02,
+        tau=0.03,
         buffer_size=1000000,
         net_arch=[1024, 1024, 1024],
         batch_size=512,
-        learning_starts=9100,
-        per_alpha=0.65,
-        policy_frequency=6,
+        learning_starts=7500,
+        per_alpha=0.7,
+        policy_frequency=20,
         env_iterations=1,
         project_name=project_name,
         experiment_name=experiment_name,
         wandb_entity=None,
         log=True,
         seed=seed,
-        device='auto'
+        device='cuda'
     )
     agent.train(
         total_timesteps=int(1e8),
@@ -40,7 +40,7 @@ def moddpg(scenario: str, seed: int):
         eval_freq=50000,
         hv_eval_freq=100000,
         reset_num_timesteps=False,
-        sub_folder=f'{scenario}{v}',
+        sub_folder=f'{scenario}',
         save_file_name=experiment_name
     )
 

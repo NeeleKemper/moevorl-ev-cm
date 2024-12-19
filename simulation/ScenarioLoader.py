@@ -33,7 +33,7 @@ class ScenarioLoader(object):
         self.seed = seed
         self.pv_noise = pv_noise
         try:
-            with open('scenarios.json') as f:
+            with open('simulation/scenarios.json') as f:
                 scenarios = json.load(f)
                 self.scenario = scenarios[scenario_name]
         except FileNotFoundError:
@@ -53,7 +53,7 @@ class ScenarioLoader(object):
         self.supply = Supply(pv_scaling=self.scenario['pv_scaling'],
                              pv_noise= self.pv_noise,
                              seed=self.seed)
-        ev_json = json.load(open('electric_vehicles.json'))
+        ev_json = json.load(open('simulation/electric_vehicles.json'))
         if data_set == 'test' or data_set == 'all':
             from simulation.ChargingPark import ChargingPark
         else:

@@ -3,8 +3,13 @@ import re
 import glob
 import pandas as pd
 import numpy as np
-from test_scripts.test_utils import (calculate_rl_metrics, calculate_mo_metrics, calculate_object_metrics, UTILIZATION, LOG_METRICS,
-                                     ALGORITHMS, SCENARIOS, get_scenario_name, print_metrics_table, METRICS, generate_plots)
+import matplotlib.pyplot as plt
+
+from morl.common.pareto import filter_pareto_dominated
+from test_scripts.test_utils import (calculate_rl_metrics, calculate_mo_metrics, calculate_object_metrics, UTILIZATION,
+                                     LOG_METRICS,
+                                     ALGORITHMS, SCENARIOS, get_scenario_name, print_metrics_table, METRICS,
+                                     generate_plots, evaluate_metrics)
 
 PATH_UTILIZATION = '../results/evaluation/test_utilization'
 PATH_HOLDOUT = '../results/evaluation/test_hold_out'
@@ -13,7 +18,7 @@ PATH_HOLDOUT = '../results/evaluation/test_hold_out'
 def read_csv(model: str, scenario: str, utilization: str = None, sub_path: str = 'test_utilization'):
     df = pd.DataFrame()
     pattern = re.compile(r".*_[0-9]+\.csv$")
-    csv_pattern = f'results/{sub_path}/{model}/scenario_{scenario}' + (
+    csv_pattern = f'../results/{sub_path}/{model}/scenario_{scenario}' + (
         f'_{utilization}' if utilization else '') + '/*.csv'
     csv_files = glob.glob(csv_pattern)
     filtered_files = [file for file in csv_files if pattern.match(file)]
@@ -43,9 +48,9 @@ def process_agents(df: pd.DataFrame, df_other: pd.DataFrame = None):
 def calculate_metrics(utilization: bool = True):
     path = PATH_UTILIZATION if utilization else PATH_HOLDOUT
     sub_path = 'test_utilization' if utilization else 'test_hold_out'
-
+    seed = 71 if utilization else 42
     for scenario in SCENARIOS:
-        title_scenario = get_scenario_name(scenario)
+        title_scenario = get_scenario_name(scenario, env_seed=seed)
         for algorithm in ALGORITHMS:
             print(f'\nAlgorithm: {algorithm} - Scenario: {scenario}')
             if utilization:
@@ -65,55 +70,22 @@ def calculate_metrics(utilization: bool = True):
                 df_results.to_csv(f'{path}/{algorithm.upper()}_{title_scenario}.csv', sep=';', index=False)
 
 
-def evaluate_metrics(utilization: bool = True):
-    path = PATH_UTILIZATION if utilization else PATH_HOLDOUT
-    for scenario in SCENARIOS:
-        title_scenario = get_scenario_name(scenario)
-        metrics = []
-        results = {alg: [] for alg in ALGORITHMS}
-        dataframes = {metric: pd.DataFrame() for metric in
-                      ['r0', 'r1', 'r2', 'success_rate', 'hypervolume', 'r2_indicator', 'spread', 'spacing',
-                       'sparsity']}
-        df_means = pd.DataFrame()
-        df_stds = pd.DataFrame()
-
-        for algorithm in ALGORITHMS:
-            df_temp = pd.read_csv(f'{path}/{algorithm.upper()}_{title_scenario}.csv', sep=';')
-            if not metrics:
-                metrics = df_temp.columns.to_list()
-
-            for metric in dataframes.keys():
-                dataframes[metric][algorithm] = df_temp[metric]
-
-            df_mean = df_temp.mean(axis=0)
-            df_std = df_temp.std(axis=0)
-            results[algorithm] = [f'{mean:.3f} ({std:.3f})' for mean, std in zip(df_mean, df_std)]
-            df_means[algorithm] = df_mean.round(3).loc[METRICS]
-            df_stds[algorithm] = df_std.round(3).loc[METRICS]
-
-        for metric, df in dataframes.items():
-            df.to_csv(f'{path}/{title_scenario}_{metric}.csv', sep=';')
-
-        df_means.to_csv(f'{path}/{title_scenario}_means.csv', sep=';')
-        df_stds.to_csv(f'{path}/{title_scenario}_stds.csv', sep=';')
-        print_metrics_table(metrics, ALGORITHMS, results)
-
-
 def main():
+    # plot_pareto_front(utilization=True)
     # Utilization evaluation
-    calculate_metrics(utilization=True)
+    # calculate_metrics(utilization=True)
     for scenario in SCENARIOS:
         for util in UTILIZATION:
             print(f'\n{get_scenario_name(scenario, util, 71)}')
-            evaluate_metrics(utilization=True)
+            evaluate_metrics(PATH_UTILIZATION, scenario, utilization=util, env_seed=71)
             generate_plots(PATH_UTILIZATION, scenario, utilization=util, env_seed=71)
-
-    # Hold-out evaluation
-    calculate_metrics(utilization=False)
+    #
+    # # Hold-out evaluation
+    # calculate_metrics(utilization=False)
     for scenario in SCENARIOS:
         print(f'\n{get_scenario_name(scenario)}')
-        evaluate_metrics(utilization=False)
-        generate_plots(PATH_HOLDOUT, scenario)
+        evaluate_metrics(PATH_HOLDOUT, scenario, utilization='norm', env_seed=42)
+        generate_plots(PATH_HOLDOUT, scenario, utilization='norm', env_seed=42)
 
 
 if __name__ == "__main__":

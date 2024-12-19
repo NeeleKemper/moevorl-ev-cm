@@ -58,6 +58,7 @@ class MOPolicy(ABC):
             vec_return,
             discounted_vec_return,
             constraint_violations,
+            reward_utility=False,
             log_name="eval"
     ):
         """Writes the data to wandb summary."""
@@ -78,8 +79,17 @@ class MOPolicy(ABC):
             wandb.log(
                 {f"{log_name}{idstr}/vec_{i}": vec_return[i]
                  # f"{log_name}{idstr}/discounted_vec_{i}": discounted_vec_return[i]
-                },
+                 },
             )
+        if reward_utility:
+            w = [1 / len(vec_return)] * len(vec_return)
+            reward = sum(w * vec_return)
+            wandb.log(
+                {f"{log_name}{idstr}/reward": reward
+                 # f"{log_name}{idstr}/discounted_vec_{i}": discounted_vec_return[i]
+                 },
+            )
+
     def report_old(
             self,
             scalarized_return,
@@ -107,7 +117,7 @@ class MOPolicy(ABC):
             wandb.log(
                 {f"{log_name}{idstr}/vec_{i}": vec_return[i],
                  f"{log_name}{idstr}/discounted_vec_{i}": discounted_vec_return[i]
-                },
+                 },
             )
 
     def policy_eval_evorl(self,

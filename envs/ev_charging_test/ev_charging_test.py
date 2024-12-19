@@ -8,6 +8,7 @@ from typing import Any, SupportsFloat
 from gymnasium.core import ObsType, ActType, RenderFrame
 from gymnasium.spaces import Box
 
+from envs.LoadManagement import LoadManagement
 from simulation.ScenarioLoader import ScenarioLoader
 from simulation.constant import MAX_PV_POWER, MIN_BATTERY_CAP, MAX_BATTERY_CAP, MIN_CHARGING_POWER, MAX_CHARGING_POWER, \
     MAX_CHARGING_TIME
@@ -18,7 +19,7 @@ BASE_PENALTY = -1
 
 
 class EVChargingTest(gym.Env):
-    def __init__(self, scenario_loader: ScenarioLoader, env_id=-1):
+    def __init__(self, scenario_loader: ScenarioLoader, env_id=-1, load_management:bool=False):
         # Initialize variables
         self.scenario_loader = scenario_loader
         self.env_id = env_id
@@ -84,6 +85,9 @@ class EVChargingTest(gym.Env):
              range(self.n_charging_points)]).flatten()
         columns = columns_global_states + columns_local_states.tolist()
         self.df_obs = pd.DataFrame(columns=columns)
+
+        self.load_management = load_management
+        self.management = LoadManagement(self.charging_park, self.max_grid_node_power, self.max_phase_difference)
 
     @staticmethod
     def __clip(value, min_value, max_value):
@@ -321,6 +325,8 @@ class EVChargingTest(gym.Env):
 
     def step(self, action: ActType) -> tuple[ObsType, SupportsFloat, bool, bool, dict[str, Any]]:
         """Takes an action in the environment and returns the next state and associated reward."""
+        if self.load_management:
+            action = self.management.calculate_action()
 
         # continues action
         scaled_action = [round(a * self.action_scaler, 4) for a in action]
@@ -329,7 +335,7 @@ class EVChargingTest(gym.Env):
 
         # Advance to the next state
         self.step_counter += 1
-        pv_power, mod= self.__simulation_step(int(self.step_counter))
+        pv_power, mod = self.__simulation_step(int(self.step_counter))
 
         next_obs = self.__get_obs(pv_power, mod)
 

@@ -7,7 +7,7 @@ from simulation.utils import make_test_env
 from morl.multi_policy.evorl.evorl_neat import EvoRLNEAT
 from morl.multi_policy.evorl.evorl_policy_net import EvoRLPolicyNet
 from morl.multi_policy.mo_ddpg.mo_ddpg import MODDPG
-
+from ddpg import DDPGAgent
 
 def run_episode(agent, env, w):
     r = np.array([0, 0, 0])
@@ -51,6 +51,8 @@ def load_setup(algorithm: str, scenario: str,  data_set: str, agent_seed: int, e
 
     if algorithm == 'moddpg':
         agent = MODDPG(envs, net_arch=[1024, 1024, 1024], log=False)
+    elif algorithm == 'ddpg':
+        agent = DDPGAgent(envs, net_arch=[1024, 1024, 1024], log=False)
     elif algorithm == 'ff_neat' or algorithm == 'rnn_neat':
         agent = EvoRLNEAT(envs, algorithm=algorithm, log=False)
     elif algorithm == 'ff_spea2':
@@ -142,9 +144,9 @@ def test_hold_out(algorithm, scenario, test_config, agent_seed=42, env_seed=42):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Run multi-agent or single-agent simulation.')
+    parser = argparse.ArgumentParser(description='Run hold-out or utilization simulation.')
     parser.add_argument('--algorithm', type=str, default='ff_neat',
-                        choices=['ff_neat', 'rnn_neat', 'ff_spea2', 'ff_nsga2', 'lstm_nsga2', 'moddpg'],
+                        choices=['ff_neat', 'rnn_neat', 'ff_spea2', 'ff_nsga2', 'lstm_nsga2', 'moddpg', 'ddpg'],
                         help='Algorithm to use')
     parser.add_argument('--scenario', type=str, default='scenario_CS05', help='Scenario to run')
     parser.add_argument('--hold_out', action='store_true', help='Flag to run in hold_out mode')

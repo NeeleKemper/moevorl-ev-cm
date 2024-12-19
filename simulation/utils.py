@@ -24,7 +24,8 @@ def make_env(scenario: str = 'scenario_CS05', data_set: str = 'train', record_ep
 
 
 def make_test_env(scenario: str = 'scenario_CS05', data_set: str = 'train', record_episode_statistics: bool = False,
-                  charging_density: str = 'norm', pv_noise: bool = False, multiple_envs: bool = False, seed: int = 42) \
+                  charging_density: str = 'norm', pv_noise: bool = False, multiple_envs: bool = False,
+                  load_management: bool = False, seed: int = 42) \
         -> MORecordEpisodeStatistics | EVChargingTest | list[EVChargingTest]:
     scenario_loader = ScenarioLoader(scenario, data_set=data_set, charging_density=charging_density,
                                      pv_noise=pv_noise, seed=seed)
@@ -32,11 +33,11 @@ def make_test_env(scenario: str = 'scenario_CS05', data_set: str = 'train', reco
         env = []
         for env_id in range(scenario_loader.n_envs):
             e = mo_gym.make('envs.ev_charging_test:ev-charging-test-v0', scenario_loader=scenario_loader,
-                            env_id=env_id)
+                            env_id=env_id, load_management=load_management)
             env.append(e)
     else:
         env = mo_gym.make('envs.ev_charging_test:ev-charging-test-v0', scenario_loader=scenario_loader,
-                          env_id=-1)
+                          env_id=-1, load_management=load_management)
         if record_episode_statistics:
             env = mo_gym.MORecordEpisodeStatistics(env, gamma=0.99)
     return env

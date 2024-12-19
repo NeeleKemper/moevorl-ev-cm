@@ -13,22 +13,22 @@ def moddpg(scenario: str, seed: int):
 
     agent = MODDPG(
         env_list,
-        learning_rate=4.5e-5,
+        learning_rate=5e-5,
         gamma=0.99,
         tau=0.03,
         buffer_size=1000000,
         net_arch=[1024, 1024, 1024],
         batch_size=512,
-        learning_starts=2000,
-        per_alpha=0.77,
-        policy_frequency=19,
+        learning_starts=7500,
+        per_alpha=0.7,
+        policy_frequency=20,
         env_iterations=1,
         project_name=project_name,
         experiment_name=experiment_name,
         wandb_entity=None,
         log=True,
         seed=seed,
-        device='auto'
+        device='cuda'
     )
     agent.train(
         total_timesteps=int(1e8),
@@ -40,7 +40,7 @@ def moddpg(scenario: str, seed: int):
         eval_freq=50000,
         hv_eval_freq=100000,
         reset_num_timesteps=False,
-        sub_folder=f'{scenario}{v}',
+        sub_folder=f'{scenario}',
         save_file_name=experiment_name
     )
 
@@ -49,4 +49,4 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Run the MODDPG algorithm.')
     parser.add_argument('--seed', type=int, default=42, help='Seed for the random number generator')
     args = parser.parse_args()
-    moddpg(scenario='scenario_CS150', seed=args.seed)
+    moddpg(scenario='scenario_CS15', seed=args.seed)
