@@ -1,0 +1,86 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>CS10-High-71</title>
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        <style>
+            /* Styling for a toggle switch */
+            .switch {
+              position: relative;
+              display: inline-block;
+              width: 60px;
+              height: 34px;
+              vertical-align: middle;
+            }
+            .switch input {
+              opacity: 0;
+              width: 0;
+              height: 0;
+            }
+            .slider {
+              position: absolute;
+              cursor: pointer;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              background-color: #ccc;
+              transition: .4s;
+            }
+            .slider:before {
+              position: absolute;
+              content: "";
+              height: 26px;
+              width: 26px;
+              left: 4px;
+              bottom: 4px;
+              background-color: white;
+              transition: .4s;
+            }
+            input:checked + .slider {
+              background-color: #2196F3;
+            }
+            input:focus + .slider {
+              box-shadow: 0 0 1px #2196F3;
+            }
+            input:checked + .slider:before {
+              transform: translateX(26px);
+            }
+            .slider.round {
+              border-radius: 34px;
+            }
+            .slider.round:before {
+              border-radius: 50%;
+            }
+        </style>
+    </head>
+    <body>
+        <div style="width: 100%; height: 1000px; position: relative; margin: 0 auto;">
+            <div id="plotly-figure" style="width: 100%; height: 100%;"></div>
+            <div style="position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); text-align: center;">
+                <label class="switch">
+                  <input type="checkbox" id="toggleHull">
+                  <span class="slider round"></span>
+                </label>
+                <span style="font-size: 16px; vertical-align: middle;">Show Convex Hull</span>
+            </div>
+        </div>
+        <script>
+            var figure = {"data": [{"marker": {"color": "black", "size": 8}, "mode": "markers", "name": "DDPG Baseline", "x": [0.4768095628415301], "y": [-0.005925136612021858], "z": [0.3754677595628415], "type": "scatter3d"}, {"marker": {"color": "blue", "size": 5, "symbol": "circle"}, "mode": "markers", "name": "FF-NSGA-II", "x": [0.6782073770491803, 0.6774133879781421, 0.6293628415300546, 0.6475737704918033], "y": [0.3326926229508197, 0.3321448087431694, 0.28822486338797815, 0.30595792349726775], "z": [0.5155398907103825, 0.5156655737704918, 0.5184401639344263, 0.5180617486338798], "type": "scatter3d"}, {"color": "blue", "i": [3, 1, 1, 1], "j": [0, 0, 3, 3], "k": [2, 2, 2, 0], "name": "FF-NSGA-II Convex Hull", "opacity": 0.3, "showscale": false, "x": [0.6782073770491803, 0.6774133879781421, 0.6293628415300546, 0.6475737704918033], "y": [0.3326926229508197, 0.3321448087431694, 0.28822486338797815, 0.30595792349726775], "z": [0.5155398907103825, 0.5156655737704918, 0.5184401639344263, 0.5180617486338798], "type": "mesh3d", "visible": false}, {"marker": {"color": "orange", "size": 5, "symbol": "square"}, "mode": "markers", "name": "FF-SPEA2", "x": [0.6806887978142077, 0.6109147540983606, 0.6811887978142076, 0.6489904371584699, 0.6841163934426229, 0.6068199453551912], "y": [0.333929781420765, 0.2716393442622951, 0.33427704918032786, 0.3088062841530055, 0.33590464480874316, 0.2658434426229508], "z": [0.5153713114754098, 0.5182273224043715, 0.5153581967213116, 0.5159469945355192, 0.5008942622950819, 0.5188685792349726], "type": "scatter3d"}, {"color": "orange", "i": [1, 1, 3, 3, 3, 2, 2, 2], "j": [4, 0, 0, 1, 1, 4, 0, 0], "k": [5, 5, 4, 4, 0, 5, 5, 4], "name": "FF-SPEA2 Convex Hull", "opacity": 0.3, "showscale": false, "x": [0.6806887978142077, 0.6109147540983606, 0.6811887978142076, 0.6489904371584699, 0.6841163934426229, 0.6068199453551912], "y": [0.333929781420765, 0.2716393442622951, 0.33427704918032786, 0.3088062841530055, 0.33590464480874316, 0.2658434426229508], "z": [0.5153713114754098, 0.5182273224043715, 0.5153581967213116, 0.5159469945355192, 0.5008942622950819, 0.5188685792349726], "type": "mesh3d", "visible": false}, {"marker": {"color": "green", "size": 5, "symbol": "diamond"}, "mode": "markers", "name": "LSTM-NSGA-II", "x": [0.6634169398907104, 0.6913516393442622, 0.6689885245901639, 0.6255724043715847], "y": [0.31751721311475406, 0.3386226775956284, 0.32308633879781423, 0.284977868852459], "z": [0.51854043715847, 0.5171789617486339, 0.5173396174863387, 0.5192732240437159], "type": "scatter3d"}, {"color": "green", "i": [2, 0, 0, 0], "j": [1, 1, 2, 2], "k": [3, 3, 3, 1], "name": "LSTM-NSGA-II Convex Hull", "opacity": 0.3, "showscale": false, "x": [0.6634169398907104, 0.6913516393442622, 0.6689885245901639, 0.6255724043715847], "y": [0.31751721311475406, 0.3386226775956284, 0.32308633879781423, 0.284977868852459], "z": [0.51854043715847, 0.5171789617486339, 0.5173396174863387, 0.5192732240437159], "type": "mesh3d", "visible": false}, {"marker": {"color": "red", "size": 5, "symbol": "cross"}, "mode": "markers", "name": "FF-NEAT", "x": [0.4779046448087431, 0.6182234972677596, 0.6054002732240438], "y": [0.0, 0.2898008196721311, 0.27694371584699456], "z": [0.5, 0.45260846994535514, 0.4769724043715847], "type": "scatter3d"}, {"marker": {"color": "purple", "size": 5, "symbol": "x"}, "mode": "markers", "name": "RNN-NEAT", "x": [0.5653647540983606, 0.6013120218579234, 0.6569284153005465, 0.6267677595628415, 0.6539374316939891, 0.6305658469945356, 0.6431415300546448, 0.6624308743169399, 0.6146289617486338, 0.6457090163934426, 0.64864043715847], "y": [0.2111825136612022, 0.2621150273224044, 0.3082636612021858, 0.2857877049180328, 0.3259562841530055, 0.29298934426229506, 0.3057393442622951, 0.3194401639344262, 0.27830054644808744, 0.31133497267759563, 0.31381338797814207], "z": [0.5332868852459016, 0.5311598360655738, 0.49046775956284155, 0.5208251366120219, 0.4804841530054645, 0.5192860655737704, 0.5184051912568306, 0.4320284153005464, 0.5211483606557377, 0.5161658469945355, 0.4950560109289618], "type": "scatter3d"}, {"color": "purple", "i": [4, 1, 2, 2, 6, 6, 9, 9, 9, 8, 8, 8], "j": [7, 4, 7, 4, 1, 2, 6, 2, 6, 1, 9, 9], "k": [0, 0, 0, 7, 0, 0, 1, 4, 2, 4, 4, 1], "name": "RNN-NEAT Convex Hull", "opacity": 0.3, "showscale": false, "x": [0.5653647540983606, 0.6013120218579234, 0.6569284153005465, 0.6267677595628415, 0.6539374316939891, 0.6305658469945356, 0.6431415300546448, 0.6624308743169399, 0.6146289617486338, 0.6457090163934426, 0.64864043715847], "y": [0.2111825136612022, 0.2621150273224044, 0.3082636612021858, 0.2857877049180328, 0.3259562841530055, 0.29298934426229506, 0.3057393442622951, 0.3194401639344262, 0.27830054644808744, 0.31133497267759563, 0.31381338797814207], "z": [0.5332868852459016, 0.5311598360655738, 0.49046775956284155, 0.5208251366120219, 0.4804841530054645, 0.5192860655737704, 0.5184051912568306, 0.4320284153005464, 0.5211483606557377, 0.5161658469945355, 0.4950560109289618], "type": "mesh3d", "visible": false}, {"marker": {"color": "brown", "size": 5, "symbol": "diamond-open"}, "mode": "markers", "name": "MODDPG", "x": [0.20047595628415302], "y": [-0.07162650273224043], "z": [-0.004459016393442619], "type": "scatter3d"}], "layout": {"template": {"data": {"histogram2dcontour": [{"type": "histogram2dcontour", "colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]]}], "choropleth": [{"type": "choropleth", "colorbar": {"outlinewidth": 0, "ticks": ""}}], "histogram2d": [{"type": "histogram2d", "colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]]}], "heatmap": [{"type": "heatmap", "colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]]}], "heatmapgl": [{"type": "heatmapgl", "colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]]}], "contourcarpet": [{"type": "contourcarpet", "colorbar": {"outlinewidth": 0, "ticks": ""}}], "contour": [{"type": "contour", "colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]]}], "surface": [{"type": "surface", "colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]]}], "mesh3d": [{"type": "mesh3d", "colorbar": {"outlinewidth": 0, "ticks": ""}}], "scatter": [{"fillpattern": {"fillmode": "overlay", "size": 10, "solidity": 0.2}, "type": "scatter"}], "parcoords": [{"type": "parcoords", "line": {"colorbar": {"outlinewidth": 0, "ticks": ""}}}], "scatterpolargl": [{"type": "scatterpolargl", "marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}}], "bar": [{"error_x": {"color": "#2a3f5f"}, "error_y": {"color": "#2a3f5f"}, "marker": {"line": {"color": "#E5ECF6", "width": 0.5}, "pattern": {"fillmode": "overlay", "size": 10, "solidity": 0.2}}, "type": "bar"}], "scattergeo": [{"type": "scattergeo", "marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}}], "scatterpolar": [{"type": "scatterpolar", "marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}}], "histogram": [{"marker": {"pattern": {"fillmode": "overlay", "size": 10, "solidity": 0.2}}, "type": "histogram"}], "scattergl": [{"type": "scattergl", "marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}}], "scatter3d": [{"type": "scatter3d", "line": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}}], "scattermapbox": [{"type": "scattermapbox", "marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}}], "scatterternary": [{"type": "scatterternary", "marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}}], "scattercarpet": [{"type": "scattercarpet", "marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}}], "carpet": [{"aaxis": {"endlinecolor": "#2a3f5f", "gridcolor": "white", "linecolor": "white", "minorgridcolor": "white", "startlinecolor": "#2a3f5f"}, "baxis": {"endlinecolor": "#2a3f5f", "gridcolor": "white", "linecolor": "white", "minorgridcolor": "white", "startlinecolor": "#2a3f5f"}, "type": "carpet"}], "table": [{"cells": {"fill": {"color": "#EBF0F8"}, "line": {"color": "white"}}, "header": {"fill": {"color": "#C8D4E3"}, "line": {"color": "white"}}, "type": "table"}], "barpolar": [{"marker": {"line": {"color": "#E5ECF6", "width": 0.5}, "pattern": {"fillmode": "overlay", "size": 10, "solidity": 0.2}}, "type": "barpolar"}], "pie": [{"automargin": true, "type": "pie"}]}, "layout": {"autotypenumbers": "strict", "colorway": ["#636efa", "#EF553B", "#00cc96", "#ab63fa", "#FFA15A", "#19d3f3", "#FF6692", "#B6E880", "#FF97FF", "#FECB52"], "font": {"color": "#2a3f5f"}, "hovermode": "closest", "hoverlabel": {"align": "left"}, "paper_bgcolor": "white", "plot_bgcolor": "#E5ECF6", "polar": {"bgcolor": "#E5ECF6", "angularaxis": {"gridcolor": "white", "linecolor": "white", "ticks": ""}, "radialaxis": {"gridcolor": "white", "linecolor": "white", "ticks": ""}}, "ternary": {"bgcolor": "#E5ECF6", "aaxis": {"gridcolor": "white", "linecolor": "white", "ticks": ""}, "baxis": {"gridcolor": "white", "linecolor": "white", "ticks": ""}, "caxis": {"gridcolor": "white", "linecolor": "white", "ticks": ""}}, "coloraxis": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "colorscale": {"sequential": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "sequentialminus": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "diverging": [[0, "#8e0152"], [0.1, "#c51b7d"], [0.2, "#de77ae"], [0.3, "#f1b6da"], [0.4, "#fde0ef"], [0.5, "#f7f7f7"], [0.6, "#e6f5d0"], [0.7, "#b8e186"], [0.8, "#7fbc41"], [0.9, "#4d9221"], [1, "#276419"]]}, "xaxis": {"gridcolor": "white", "linecolor": "white", "ticks": "", "title": {"standoff": 15}, "zerolinecolor": "white", "automargin": true, "zerolinewidth": 2}, "yaxis": {"gridcolor": "white", "linecolor": "white", "ticks": "", "title": {"standoff": 15}, "zerolinecolor": "white", "automargin": true, "zerolinewidth": 2}, "scene": {"xaxis": {"backgroundcolor": "#E5ECF6", "gridcolor": "white", "linecolor": "white", "showbackground": true, "ticks": "", "zerolinecolor": "white", "gridwidth": 2}, "yaxis": {"backgroundcolor": "#E5ECF6", "gridcolor": "white", "linecolor": "white", "showbackground": true, "ticks": "", "zerolinecolor": "white", "gridwidth": 2}, "zaxis": {"backgroundcolor": "#E5ECF6", "gridcolor": "white", "linecolor": "white", "showbackground": true, "ticks": "", "zerolinecolor": "white", "gridwidth": 2}}, "shapedefaults": {"line": {"color": "#2a3f5f"}}, "annotationdefaults": {"arrowcolor": "#2a3f5f", "arrowhead": 0, "arrowwidth": 1}, "geo": {"bgcolor": "white", "landcolor": "#E5ECF6", "subunitcolor": "white", "showland": true, "showlakes": true, "lakecolor": "white"}, "title": {"x": 0.05}, "mapbox": {"style": "light"}}}, "font": {"family": "Times New Roman", "size": 14}, "scene": {"camera": {"eye": {"x": 1.7, "y": -1.5, "z": 1.0}, "center": {"x": 0, "y": 0, "z": 0}, "up": {"x": 0, "y": 0, "z": 1}}, "aspectmode": "cube", "xaxis": {"title": {"text": "R<sub>SoC</sub> (\u2191)"}}, "yaxis": {"title": {"text": "R<sub>PV</sub> (\u2191)"}}, "zaxis": {"title": {"text": "R<sub>smooth</sub> (\u2191)"}}}, "legend": {"orientation": "h", "yanchor": "bottom", "y": 0, "xanchor": "center", "x": 0.5}, "title": {"text": "CS10-High-71"}}};
+            var hullIndices = [2, 4, 6, 9];
+
+            Plotly.newPlot('plotly-figure', figure.data, figure.layout).then(function() {
+                document.getElementById('toggleHull').addEventListener('change', function() {
+                    var visibility = this.checked;
+                    hullIndices.forEach(function(idx) {
+                        Plotly.restyle('plotly-figure', {'visible': visibility}, [idx]);
+                    });
+                });
+            });
+        </script>
+    </body>
+    </html>
+    </html>
+    

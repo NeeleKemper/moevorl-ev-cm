@@ -3,13 +3,10 @@ import re
 import glob
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 
-from morl.common.pareto import filter_pareto_dominated
 from test_scripts.test_utils import (calculate_rl_metrics, calculate_mo_metrics, calculate_object_metrics, UTILIZATION,
-                                     LOG_METRICS,
-                                     ALGORITHMS, SCENARIOS, get_scenario_name, print_metrics_table, METRICS,
-                                     generate_plots, evaluate_metrics)
+                                     LOG_METRICS, ALGORITHMS, SCENARIOS, get_scenario_name, generate_plots,
+                                     evaluate_metrics)
 
 PATH_UTILIZATION = '../results/evaluation/test_utilization'
 PATH_HOLDOUT = '../results/evaluation/test_hold_out'
@@ -71,7 +68,6 @@ def calculate_metrics(utilization: bool = True):
 
 
 def main():
-    # plot_pareto_front(utilization=True)
     # Utilization evaluation
     # calculate_metrics(utilization=True)
     for scenario in SCENARIOS:

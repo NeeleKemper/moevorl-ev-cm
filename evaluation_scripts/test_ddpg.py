@@ -1,17 +1,19 @@
+import json
 import os
 import re
 import glob
 import pandas as pd
 import numpy as np
+import plotly
 import seaborn as sns
 import matplotlib.pyplot as plt
+import plotly.graph_objects as go
 from tabulate import tabulate
+from scipy.spatial import ConvexHull
 
 from morl.common.pareto import filter_pareto_dominated
-from test_scripts.test_utils import (calculate_rl_metrics, calculate_mo_metrics, calculate_object_metrics, UTILIZATION,
-                                     LOG_METRICS,
-                                     ALGORITHMS, SCENARIOS, get_scenario_name, print_metrics_table, METRICS,
-                                     generate_plots, ALGORITHMS_NAMES)
+from test_scripts.test_utils import (calculate_rl_metrics, UTILIZATION, ALGORITHMS, SCENARIOS, get_scenario_name,
+                                     ALGORITHMS_NAMES)
 
 sns.set(style="whitegrid", color_codes=True)
 
@@ -268,7 +270,7 @@ def plot_pareto_front_single_agent(path: str, scenario: str, utilization: str = 
     title_scenario = get_scenario_name(scenario, utilization, env_seed)
     print(f'\nScenario: {scenario}')
 
-    fig, axes = plt.subplots(3, 1, figsize=(8, 6))  # Create 3 vertically stacked subplots
+    fig, axes = plt.subplots(3, 1, figsize=(8, 8))  # Create 3 vertically stacked subplots
 
     if env_seed == 42:
         df = read_csv(model='ddpg', scenario=scenario, utilization=utilization)
@@ -311,15 +313,6 @@ def plot_pareto_front_single_agent(path: str, scenario: str, utilization: str = 
 
         # Split Pareto front into dimensions
         pf_soc, pf_load, pf_pv = np.split(pf, 3, axis=1)
-        soc, load, pv = np.split(solutions, 3, axis=1)
-
-        # Plot Pareto fronts
-        # axes[0].scatter(soc, load, s=10, alpha=0.5,
-        #                color=colors[i % len(colors)], marker=markers[i % len(markers)])
-        # axes[1].scatter(soc, pv, s=10, alpha=0.5, color=colors[i % len(colors)],
-        #                marker=markers[i % len(markers)])
-        # axes[2].scatter(pv, load, s=10, alpha=0.5, color=colors[i % len(colors)],
-        #                marker=markers[i % len(markers)])
 
         axes[0].scatter(pf_soc, pf_load, s=s, alpha=0.8,
                         color=colors[i % len(colors)], marker=markers[i % len(markers)])
@@ -328,12 +321,6 @@ def plot_pareto_front_single_agent(path: str, scenario: str, utilization: str = 
         axes[2].scatter(pf_pv, pf_load, s=s, alpha=0.8, color=colors[i % len(colors)],
                         marker=markers[i % len(markers)])
 
-    # Set legend only for the top plot
-    # axes[1].legend(
-    #    loc='center left',  # Legende links neben dem Ankerpunkt ausrichten
-    #    bbox_to_anchor=(1, 0.5),  # Ankerpunkt: rechts außerhalb des Plots, zentriert in der Höhe
-    #    fontsize=font_size
-    # )
     for ax in axes:
         ax.grid(True)
 
@@ -360,6 +347,302 @@ def plot_pareto_front_single_agent(path: str, scenario: str, utilization: str = 
     plt.show()
 
 
+def plot_pareto_front_single_agent_3d(path: str, scenario: str, utilization: str = 'norm', env_seed: int = 42,
+                                      sub_path: str = None):
+    markers = ['o', '^', 's', 'D', 'v', 'x']
+    cmap = plt.colormaps['tab10']  # Use the tab10 colormap
+    colors = [cmap(i) for i in range(len(ALGORITHMS))]
+    plt.rcParams['font.family'] = 'serif'
+    plt.rcParams['font.serif'] = ['DejaVu Serif']
+    font_size = 16
+    s = 50
+
+    title_scenario = get_scenario_name(scenario, utilization, env_seed)
+    print(f'\nScenario: {scenario}')
+
+    fig = plt.figure(figsize=(10, 8))
+    ax = fig.add_subplot(111, projection='3d')
+
+    if env_seed == 42:
+        df = read_csv(model='ddpg', scenario=scenario, utilization=utilization)
+    else:
+        df = read_csv(model='ddpg', scenario=scenario, utilization=utilization, sub_path=sub_path)
+    df['mean_reward'] = df[['r0', 'r1', 'r2']].mean(axis=1)
+
+    best_agent_id = df.groupby('agent_id')['mean_reward'].mean().idxmax()
+    print(f"Agent with the highest mean reward: {best_agent_id}")
+
+    df = df[df['agent_id'] == best_agent_id]
+    baseline = df[['r0', 'r1', 'r2']].mean().values
+    soc_baseline = baseline[0]  # x-axis: SoC (r0)
+    smooth_baseline = baseline[1]  # z-axis: smoothness (r1)
+    pv_baseline = baseline[2]  # y-axis: PV (r2)
+    baseline_color = 'black'
+    baseline_s = 60
+
+    ax.scatter(soc_baseline, pv_baseline, smooth_baseline, color=baseline_color,
+               s=baseline_s, alpha=0.8, label='DDPG Baseline')
+
+    ax.xaxis.set_pane_color((1.0, 1.0, 1.0, 1.0))
+    ax.yaxis.set_pane_color((1.0, 1.0, 1.0, 1.0))
+    ax.zaxis.set_pane_color((1.0, 1.0, 1.0, 1.0))
+
+    for i, algorithm in enumerate(ALGORITHMS):
+        print(f'Algorithm: {algorithm}')
+        if env_seed == 42:
+            df = read_csv(model=algorithm, scenario=scenario, utilization=utilization)
+        else:
+            df = read_csv(model=algorithm, scenario=scenario, utilization=utilization, sub_path=sub_path)
+        df = df[df['agent_id'] == best_agent_id]
+        df_weight = df.groupby(['weight_number']).mean()
+        solutions = df_weight[['r0', 'r1', 'r2']].values
+        pf = filter_pareto_dominated(solutions.tolist())
+        pf = np.array(pf)
+
+        pf_soc = pf[:, 0]
+        pf_smooth = pf[:, 1]
+        pf_pv = pf[:, 2]
+
+        ax.scatter(pf_soc, pf_pv, pf_smooth, s=s, alpha=0.8,
+                   color=colors[i % len(colors)], marker=markers[i % len(markers)],
+                   label=f'{ALGORITHMS_NAMES[i]}')
+
+    ax.set_xlabel(r'$\mathbf{R_{SoC}}$ ($\uparrow$)', fontfamily='DejaVu Serif', fontsize=font_size,
+                  fontweight='bold', labelpad=20)
+    ax.set_ylabel(r'$\mathbf{R_{PV}}$ ($\uparrow$)', fontfamily='DejaVu Serif', fontsize=font_size,
+                  fontweight='bold', labelpad=20)
+    ax.set_zlabel(r'$\mathbf{R_{smooth}}$ ($\uparrow$)', fontfamily='DejaVu Serif', fontsize=font_size,
+                  fontweight='bold', labelpad=20)
+
+    # Increase tick label font size and add padding for ticks
+    ax.tick_params(axis='x', labelsize=font_size - 2, pad=10)
+    ax.tick_params(axis='y', labelsize=font_size - 2, pad=10)
+    ax.tick_params(axis='z', labelsize=font_size - 2, pad=10)
+
+    ax.grid(True)
+
+    handles, labels = ax.get_legend_handles_labels()
+    if ax.get_legend() is not None:
+        ax.get_legend().remove()
+
+    plt.tight_layout(rect=[0, 0.1, 1, 1])
+
+    fig.legend(handles, labels, loc='lower center', bbox_to_anchor=(0.5, 0.0),
+               fontsize=font_size, ncol=4)
+
+    dir_box = f'{path}/plots/{title_scenario}/pareto_front'
+    if not os.path.isdir(dir_box):
+        os.makedirs(dir_box)
+    plt.savefig(f'{dir_box}/agent_{best_agent_id}_{title_scenario}_3d.png')
+    plt.show()
+
+
+def plot_pareto_front_single_agent_3d_interactive(path: str, scenario: str, utilization: str = 'norm',
+                                                  env_seed: int = 42, sub_path: str = None):
+    title_scenario = get_scenario_name(scenario, utilization, env_seed)
+    print(f'\nScenario: {scenario}')
+
+    if env_seed == 42:
+        df = read_csv(model='ddpg', scenario=scenario, utilization=utilization)
+    else:
+        df = read_csv(model='ddpg', scenario=scenario, utilization=utilization, sub_path=sub_path)
+    df['mean_reward'] = df[['r0', 'r1', 'r2']].mean(axis=1)
+
+    best_agent_id = df.groupby('agent_id')['mean_reward'].mean().idxmax()
+    print(f"Agent with the highest mean reward: {best_agent_id}")
+
+    df = df[df['agent_id'] == best_agent_id]
+    baseline = df[['r0', 'r1', 'r2']].mean().values
+    soc_baseline = baseline[0]  # x-axis: SoC (r0)
+    smooth_baseline = baseline[1]  # z-axis: smoothness (r1)
+    pv_baseline = baseline[2]  # y-axis: PV (r2)
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatter3d(
+        x=[soc_baseline],
+        y=[pv_baseline],
+        z=[smooth_baseline],
+        mode='markers',
+        marker=dict(size=8, color='black'),
+        name='DDPG Baseline'
+    ))
+
+    marker_symbols = ['circle', 'square', 'diamond', 'cross', 'x', 'diamond-open']
+    colors = ['blue', 'orange', 'green', 'red', 'purple', 'brown']
+
+    hull_trace_indices = []
+
+    for i, algorithm in enumerate(ALGORITHMS):
+        print(f'Algorithm: {algorithm}')
+        if env_seed == 42:
+            df_alg = read_csv(model=algorithm, scenario=scenario, utilization=utilization)
+        else:
+            df_alg = read_csv(model=algorithm, scenario=scenario, utilization=utilization, sub_path=sub_path)
+        df_alg = df_alg[df_alg['agent_id'] == best_agent_id]
+        df_weight = df_alg.groupby(['weight_number']).mean()
+        solutions = df_weight[['r0', 'r1', 'r2']].values
+
+        pf = filter_pareto_dominated(solutions.tolist())
+        pf = np.array(pf)
+
+        pf_soc = pf[:, 0]
+        pf_smooth = pf[:, 1]
+        pf_pv = pf[:, 2]
+
+        # Add the Pareto front points as markers
+        fig.add_trace(go.Scatter3d(
+            x=pf_soc,
+            y=pf_pv,
+            z=pf_smooth,
+            mode='markers',
+            marker=dict(size=5, symbol=marker_symbols[i % len(marker_symbols)], color=colors[i % len(colors)]),
+            name=ALGORITHMS_NAMES[i]
+        ))
+
+        if pf.shape[0] >= 4:
+            hull = ConvexHull(pf)
+            hull_trace = go.Mesh3d(
+                x=pf_soc,
+                y=pf_pv,
+                z=pf_smooth,
+                i=hull.simplices[:, 0],
+                j=hull.simplices[:, 1],
+                k=hull.simplices[:, 2],
+                opacity=0.3,
+                color=colors[i % len(colors)],
+                name=f'{ALGORITHMS_NAMES[i]} Convex Hull',
+                showscale=False
+            )
+            fig.add_trace(hull_trace)
+            hull_trace_indices.append(len(fig.data) - 1)
+
+    for idx in hull_trace_indices:
+        fig.data[idx].visible = False
+
+    total_traces = len(fig.data)
+    visibility_hull_off = [True] * total_traces
+    for idx in hull_trace_indices:
+        visibility_hull_off[idx] = False
+
+    fig.update_layout(
+        font_family="Times New Roman",
+        font_size=14,
+        scene=dict(
+            aspectmode='cube',
+            xaxis_title="R<sub>SoC</sub> (↑)",
+            yaxis_title="R<sub>PV</sub> (↑)",
+            zaxis_title="R<sub>smooth</sub> (↑)",
+            camera=dict(
+                eye=dict(x=1.7, y=-1.5, z=1.0),
+                center=dict(x=0, y=0, z=0),
+                up=dict(x=0, y=0, z=1)
+            ),
+
+        ),
+        title=title_scenario,
+        legend=dict(orientation="h", yanchor="bottom", y=0, xanchor="center", x=0.5),
+        # font=dict(family="Times New Roman",size=14,color="black")),
+    )
+
+    fig_json = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+    hull_indices_json = json.dumps(hull_trace_indices)
+
+    html_str = f"""
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>{title_scenario}</title>
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        <style>
+            /* Styling for a toggle switch */
+            .switch {{
+              position: relative;
+              display: inline-block;
+              width: 60px;
+              height: 34px;
+              vertical-align: middle;
+            }}
+            .switch input {{
+              opacity: 0;
+              width: 0;
+              height: 0;
+            }}
+            .slider {{
+              position: absolute;
+              cursor: pointer;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              background-color: #ccc;
+              transition: .4s;
+            }}
+            .slider:before {{
+              position: absolute;
+              content: "";
+              height: 26px;
+              width: 26px;
+              left: 4px;
+              bottom: 4px;
+              background-color: white;
+              transition: .4s;
+            }}
+            input:checked + .slider {{
+              background-color: #2196F3;
+            }}
+            input:focus + .slider {{
+              box-shadow: 0 0 1px #2196F3;
+            }}
+            input:checked + .slider:before {{
+              transform: translateX(26px);
+            }}
+            .slider.round {{
+              border-radius: 34px;
+            }}
+            .slider.round:before {{
+              border-radius: 50%;
+            }}
+        </style>
+    </head>
+    <body>
+        <div style="width: 100%; height: 1000px; position: relative; margin: 0 auto;">
+            <div id="plotly-figure" style="width: 100%; height: 100%;"></div>
+            <div style="position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); text-align: center;">
+                <label class="switch">
+                  <input type="checkbox" id="toggleHull">
+                  <span class="slider round"></span>
+                </label>
+                <span style="font-size: 16px; vertical-align: middle;">Show Convex Hull</span>
+            </div>
+        </div>
+        <script>
+            var figure = {fig_json};
+            var hullIndices = {hull_indices_json};
+
+            Plotly.newPlot('plotly-figure', figure.data, figure.layout).then(function() {{
+                document.getElementById('toggleHull').addEventListener('change', function() {{
+                    var visibility = this.checked;
+                    hullIndices.forEach(function(idx) {{
+                        Plotly.restyle('plotly-figure', {{'visible': visibility}}, [idx]);
+                    }});
+                }});
+            }});
+        </script>
+    </body>
+    </html>
+    </html>
+    """
+
+    dir_box = f'{path}/plots/{title_scenario}/pareto_front'
+    if not os.path.isdir(dir_box):
+        os.makedirs(dir_box)
+    html_file = f'{dir_box}/agent_{int(best_agent_id)}_{title_scenario}_3d_interactive.html'
+    with open(html_file, 'w') as f:
+        f.write(html_str)
+
+
 def main():
     # calculate_metrics(utilization=True)
     # calculate_metrics(utilization=False)
@@ -370,6 +653,10 @@ def main():
             evaluate_metrics(PATH_UTILIZATION, scenario, utilization=util, env_seed=71)
             plot_pareto_front(PATH_UTILIZATION, scenario=scenario, utilization=util, env_seed=71,
                               sub_path='test_utilization')
+            plot_pareto_front_single_agent_3d(PATH_UTILIZATION, scenario=scenario, utilization=util, env_seed=71,
+                                              sub_path='test_utilization')
+            plot_pareto_front_single_agent_3d_interactive(PATH_UTILIZATION, scenario=scenario, utilization=util,
+                                              env_seed=71, sub_path='test_utilization')
             plot_pareto_front_single_agent(PATH_UTILIZATION, scenario=scenario, utilization=util, env_seed=71,
                                            sub_path='test_utilization')
 
@@ -377,8 +664,6 @@ def main():
         print(f'\n{get_scenario_name(scenario)}')
         evaluate_metrics(PATH_HOLDOUT, scenario, utilization='norm', env_seed=42)
         plot_pareto_front(PATH_HOLDOUT, scenario=scenario, utilization='norm', env_seed=42, sub_path='test_hold_out')
-        plot_pareto_front_single_agent(PATH_UTILIZATION, scenario=scenario, utilization='norm', env_seed=71,
-                                       sub_path='test_utilization')
 
 
 if __name__ == "__main__":
